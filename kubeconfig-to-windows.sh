@@ -1,0 +1,29 @@
+WSL_PREFIX="\\\\wsl.localhost\\Ubuntu"
+TARGET_CONFIG=$(wslpath "$(wslvar USERPROFILE)")/.kube/config
+
+clusters=$(kubectl config view -o jsonpath='{.clusters[*].name}')
+users=$(kubectl config view -o jsonpath='{.users[*].name}')
+
+TEMP_CONFIG="config-temp"
+echo "Copying config to \"$TEMP_CONFIG\""
+kubectl config view > $TEMP_CONFIG
+
+for cluster in $clusters; do
+    jsonpath='{.clusters[?(@.name == "'$cluster'")].cluster.certificate-authority}'
+    CERTIFICATE_AUTHORITY="$WSL_PREFIX$(kubectl config view -o jsonpath='{.clusters[?(@.name == "'$cluster'")].cluster.certificate-authority}')"
+    echo "Setting certificate-authority for cluster \"$cluster\" to \"$CERTIFICATE_AUTHORITY\""
+    kubectl config --kubeconfig=$TEMP_CONFIG set-cluster $cluster --certificate-authority="$CERTIFICATE_AUTHORITY"
+done
+
+for user in $users; do
+    CLIENT_CERTIFICATE="$WSL_PREFIX$(kubectl config view -o jsonpath='{.users[?(@.name == "'$user'")].user.client-certificate}')"
+    CLIENT_KEY="$WSL_PREFIX$(kubectl config view -o jsonpath='{.users[?(@.name == "'$user'")].user.client-key}')"
+    echo "Setting client-certificate for user \"$user\" to \"$CLIENT_CERTIFICATE\""
+    kubectl config --kubeconfig=$TEMP_CONFIG set-credentials $user --client-certificate="$CLIENT_CERTIFICATE"
+    echo "Setting client-key for user \"$user\" to \"$CLIENT_KEY\""
+    kubectl config --kubeconfig=$TEMP_CONFIG set-credentials $user --client-key="$CLIENT_KEY"
+done
+
+echo "Moving \"$TEMP_CONFIG\" to \"$TARGET_CONFIG\""
+mv $TEMP_CONFIG $TARGET_CONFIG
+echo "Done!"
