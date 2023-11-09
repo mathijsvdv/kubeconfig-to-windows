@@ -8,3 +8,13 @@ wget https://raw.githubusercontent.com/mathijsvdv/kubeconfig-to-windows/master/k
 mv kubeconfig-to-windows $HOME/.local/bin/
 chmod +x $HOME/.local/bin/kubeconfig-to-windows
 ```
+
+## Usage
+After installing, run the script using:
+```bash
+kubeconfig-to-windows
+```
+
+This will take the current config of your clusters, and copy it over to the equivalent Windows folder in %USERPROFILE%/.kube/config,
+while prepending "\\wsl.localhost\Ubuntu" to the paths to the cluster certificate authority, client certificate and client key files, so that they become valid Windows paths. Subsequently, Kubernetes Lens (installed on Windows)
+can pick up this kubeconfig file ('+' icon -> 'Select Kubeconfig file(s)') and connect to the clusters defined in it.
