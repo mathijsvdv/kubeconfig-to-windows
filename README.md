@@ -4,7 +4,7 @@ Utility script to write the kubeconfig in WSL to the Windows folders so that Len
 ## Install
 Download the shell script to $HOME/.local/bin to make it available anywhere in WSL:
 ```bash
-curl https://raw.githubusercontent.com/mathijsvdv/kubeconfig-to-windows -o kubeconfig-to-windows
+wget https://raw.githubusercontent.com/mathijsvdv/kubeconfig-to-windows/master/kubeconfig-to-windows -O kubeconfig-to-windows
 mv kubeconfig-to-windows $HOME/.local/bin/
 chmod +x $HOME/.local/bin/kubeconfig-to-windows
 ```
